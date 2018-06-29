@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="Grey1B">#1B1B1B</color>
+    <color name="white">#FFFFFF</color>
+    <color name="translucent_black">#40000000</color>
+    <color name="selected_text">#45507c</color>
+    <color name="unselected_text">#7095c2</color>
+    <color name="yellow_for_data">#f5c102</color>
+    <color name="yellow_for_status">#ffec01</color>
+    <color name="hint_color">#96a2b1</color>
+    <color name="info_bg">#45507c</color>
+    <color name="bg_phtoto_frame">#2f3132</color>
+    <color name="bg_reg_notice">#222222</color>
+    <color name="transparency">#FFFFFFFF</color>
+    <color name="text_color01">#f9f9f9</color>
+    <color name="text_color02">#878787</color>
+    <color name="text_color03">#f8f8f8</color>
+    <color name="text_color04">#424344</color>
+    <color name="text_color05">#ffffff</color>
+
+    <color name="text_color1">#424d7a</color>
+    <color name="text_color2">#96A2B1</color>
+    <color name="text_color3">#323232</color>
+    <color name="text_color4">#8a8b8f</color>
+
+    <color name="bg_focus">#79a7ff</color>
+    <color name="bg_normal">#c0ccda</color>
+    <color name="txt_edittext">#646464</color>
+    <color name="txt_edittext_hint">#c5cedd</color>
+
+    <color name="promptview_text">#1ffff7</color>
+
+    <color name="bg_thirteen_blue_1">#00a1ea</color>
+    <color name="bg_thirteen_blue_2">#008ac6</color>
+    <color name="text_thirteen_white">#e4e4e4</color>
+    <color name="round_thirteen_white">#88e4e4e4</color>
+    <color name="bg_head">#80000000</color>
+
+    <color name="black">#000000</color>
+    <color name="text_select">#b7ada4</color>
+    <color name="text_color">#c3c1c1</color>
+    <color name="main_color">#2698de</color>
+
+
+</resources>

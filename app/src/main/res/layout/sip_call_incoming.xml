@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/topLayout"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="#fff">
+
+	<RelativeLayout
+		android:id="@+id/top_bar"
+		android:layout_width="match_parent"
+		android:layout_height="60dp"
+		android:background="@color/colorF">
+
+		<TextView
+			style="@style/font1"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:gravity="center"
+			android:text="Домофон" />
+
+	</RelativeLayout>
+
+	<RelativeLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_above="@+id/menu"
+		android:layout_below="@id/top_bar"
+		android:paddingTop="10dp">
+
+		<TextView
+			android:id="@+id/contact_name"
+			style="@style/font5"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentTop="true"
+			android:layout_centerHorizontal="true"
+			android:gravity="center_vertical|center_horizontal"
+			android:paddingTop="5dp" />
+
+		<RelativeLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_margin="5dp"
+			android:gravity="center">
+
+			<ImageView
+				android:layout_width="250dp"
+				android:layout_height="wrap_content"
+				android:layout_alignParentTop="true"
+				android:adjustViewBounds="true"
+				android:src="@drawable/sip_domofon_ava" />
+
+		</RelativeLayout>
+
+	</RelativeLayout>
+
+	<LinearLayout
+		android:id="@+id/menu"
+		android:layout_width="match_parent"
+		android:layout_height="60dp"
+		android:layout_alignParentBottom="true"
+		android:orientation="horizontal">
+
+		<ImageView
+			android:id="@+id/decline"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:background="@drawable/sip_hangup"
+			android:padding="12dp"
+			android:src="@drawable/sip_call_hangup" />
+
+		<LinearLayout
+			android:id="@+id/acceptUnlock"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="bottom"
+			android:background="@color/colorA"
+			android:orientation="horizontal"
+			android:paddingBottom="15dp"
+			android:paddingLeft="15dp"
+			android:paddingTop="15dp"
+			android:visibility="gone">
+
+			<ImageView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/sip_arrow_accept" />
+
+			<ImageView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:alpha="0.6"
+				android:src="@drawable/sip_arrow_accept" />
+
+			<ImageView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:alpha="0.2"
+				android:src="@drawable/sip_arrow_accept" />
+		</LinearLayout>
+
+		<ImageView
+			android:id="@+id/accept"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:background="@drawable/sip_call"
+			android:padding="12dp"
+			android:src="@drawable/sip_call_audio_start" />
+
+		<LinearLayout
+			android:id="@+id/declineUnlock"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="bottom"
+			android:background="@color/colorD"
+			android:orientation="horizontal"
+			android:paddingBottom="15dp"
+			android:paddingLeft="15dp"
+			android:paddingTop="15dp"
+			android:visibility="gone">
+
+			<ImageView
+				android:id="@+id/arrow_hangup"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:alpha="0.2"
+				android:src="@drawable/sip_arrow_hangup" />
+
+
+			<ImageView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:alpha="0.6"
+				android:src="@drawable/sip_arrow_hangup" />
+
+			<ImageView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/sip_arrow_hangup" />
+
+		</LinearLayout>
+	</LinearLayout>
+
+</RelativeLayout>

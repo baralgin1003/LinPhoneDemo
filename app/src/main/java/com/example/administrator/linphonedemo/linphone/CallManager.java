@@ -1,6 +1,8 @@
+package com.example.administrator.linphonedemo.linphone;
+
 /*
 CallManager.java
-Copyright (C) 2010  Belledonne Communications, Grenoble, France
+Copyright (C) 2017  Belledonne Communications, Grenoble, France
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -16,7 +18,6 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-package com.example.administrator.linphonedemo.linphone;
 
 import org.linphone.core.LinphoneAddress;
 import org.linphone.core.LinphoneCall;
@@ -27,31 +28,28 @@ import org.linphone.mediastream.Log;
 
 
 /**
- * Handle call updating, reinvites.
- * 
- * @author Guillaume Beraudo
- *
+ * Handle sip_call updating, reinvites.
  */
 public class CallManager {
 
 	private static CallManager instance;
-	
+
 	private CallManager() {}
 	public static final synchronized CallManager getInstance() {
 		if (instance == null) instance = new CallManager();
 		return instance;
 	}
-	
+
 	private BandwidthManager bm() {
 		return BandwidthManager.getInstance();
 	}
-	
 
-	
-	
+
+
+
 	public void inviteAddress(LinphoneAddress lAddress, boolean videoEnabled, boolean lowBandwidth) throws LinphoneCoreException {
 		LinphoneCore lc = LinphoneManager.getLc();
-		
+
 		LinphoneCallParams params = lc.createCallParams(null);
 		bm().updateWithProfileSettings(lc, params);
 
@@ -60,10 +58,10 @@ public class CallManager {
 		} else {
 			params.setVideoEnabled(false);
 		}
-		
+
 		if (lowBandwidth) {
 			params.enableLowBandwidth(true);
-			Log.d("Low bandwidth enabled in call params");
+			Log.d("Low bandwidth enabled in sip_call params");
 		}
 
 		lc.inviteAddressWithParams(lAddress, params);
@@ -71,10 +69,10 @@ public class CallManager {
 
 
 
-	
+
 	/**
-	 * Add video to a currently running voice only call.
-	 * No re-invite is sent if the current call is already video
+	 * Add sip_video to a currently running voice only sip_call.
+	 * No re-invite is sent if the current sip_call is already sip_video
 	 * or if the bandwidth settings are too low.
 	 * @return if updateCall called
 	 */
@@ -82,15 +80,15 @@ public class CallManager {
 		LinphoneCore lc =  LinphoneManager.getLc();
 		LinphoneCall lCall = lc.getCurrentCall();
 		if (lCall == null) {
-			Log.e("Trying to reinviteWithVideo while not in call: doing nothing");
+			Log.e("Trying to reinviteWithVideo while not in sip_call: doing nothing");
 			return false;
 		}
-		LinphoneCallParams params = lCall.getCurrentParamsCopy();
+		LinphoneCallParams params = lc.createCallParams(lCall);
 
 		if (params.getVideoEnabled()) return false;
-		
 
-		// Check if video possible regarding bandwidth limitations
+
+		// Check if sip_video possible regarding bandwidth limitations
 		bm().updateWithProfileSettings(lc, params);
 
 		// Abort if not enough bandwidth...
@@ -98,13 +96,13 @@ public class CallManager {
 			return false;
 		}
 
-		// Not yet in video call: try to re-invite with video
+		// Not yet in sip_video sip_call: try to re-invite with sip_video
 		lc.updateCall(lCall, params);
 		return true;
 	}
 
 
-	
+
 	/**
 	 * Re-invite with parameters updated from profile.
 	 */
@@ -112,29 +110,29 @@ public class CallManager {
 		LinphoneCore lc = LinphoneManager.getLc();
 		LinphoneCall lCall = lc.getCurrentCall();
 		if (lCall == null) {
-			Log.e("Trying to reinvite while not in call: doing nothing");
+			Log.e("Trying to reinvite while not in sip_call: doing nothing");
 			return;
 		}
-		LinphoneCallParams params = lCall.getCurrentParamsCopy();
+		LinphoneCallParams params = lc.createCallParams(lCall);
 		bm().updateWithProfileSettings(lc, params);
 		lc.updateCall(lCall, params);
 	}
 
 	/**
-	 * Change the preferred video size used by linphone core. (impact landscape/portrait buffer).
-	 * Update current call, without reinvite.
+	 * Change the preferred sip_video size used by linphone core. (impact landscape/portrait buffer).
+	 * Update current sip_call, without reinvite.
 	 * The camera will be restarted when mediastreamer chain is recreated and setParameters is called.
 	 */
 	public void updateCall() {
 		LinphoneCore lc = LinphoneManager.getLc();
 		LinphoneCall lCall = lc.getCurrentCall();
 		if (lCall == null) {
-			Log.e("Trying to updateCall while not in call: doing nothing");
+			Log.e("Trying to updateCall while not in sip_call: doing nothing");
 			return;
 		}
-		LinphoneCallParams params = lCall.getCurrentParamsCopy();
+		LinphoneCallParams params = lc.createCallParams(lCall);
 		bm().updateWithProfileSettings(lc, params);
 		lc.updateCall(lCall, null);
 	}
-	
+
 }

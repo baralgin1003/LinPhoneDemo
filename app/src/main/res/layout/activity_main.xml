@@ -21,7 +21,6 @@
         android:textSize="20sp"
         android:layout_gravity="center"
         android:gravity="center"
-        android:textColor="@color/black"
         android:id="@+id/login"
         android:text="登录"
         android:layout_margin="10dp"
@@ -34,7 +33,7 @@
         android:textSize="20sp"
         android:layout_gravity="center"
         android:gravity="center"
-        android:textColor="@color/black"
+
         android:id="@+id/dial"
         android:text="通话"
         android:layout_margin="10dp"

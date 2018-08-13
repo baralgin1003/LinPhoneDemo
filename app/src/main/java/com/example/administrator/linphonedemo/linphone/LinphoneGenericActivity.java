@@ -1,7 +1,7 @@
 package com.example.administrator.linphonedemo.linphone;
 
 /*
-UIThreadDispatcher.java
+LinphoneGenericActivity.java
 Copyright (C) 2017  Belledonne Communications, Grenoble, France
 
 This program is free software; you can redistribute it and/or
@@ -19,13 +19,26 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-import android.os.Handler;
-import android.os.Looper;
+import android.app.Activity;
+import android.os.Bundle;
 
-public class UIThreadDispatcher {
-	private static Handler mHandler = new Handler(Looper.getMainLooper());
+public class LinphoneGenericActivity extends Activity {
 
-	public static void dispatch(Runnable r) {
-		mHandler.post(r);
-	}
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        /*After a crash, Android restart the last Activity so we need to check
+        * if all dependencies are load
+        */
+        if (!LinphoneService.isReady()) {
+            finish();
+            startService(getIntent().setClass(this, LinphoneService.class));
+            return;
+        }
+        if (!LinphoneManager.isInstanciated()) {
+            finish();
+            return;
+        }
+    }
 }

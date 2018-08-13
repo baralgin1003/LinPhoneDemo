@@ -1,25 +1,29 @@
 package com.example.administrator.linphonedemo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.administrator.linphonedemo.linphone.DataFetcher;
-import com.example.administrator.linphonedemo.linphone.ILinphoneLauncher;
-import com.example.administrator.linphonedemo.linphone.LinphoneLauncher;
 import com.example.administrator.linphonedemo.linphone.LinphoneManager;
 import com.example.administrator.linphonedemo.linphone.LinphonePreferences;
+import com.example.administrator.linphonedemo.linphone.LinphoneService;
+import com.example.administrator.linphonedemo.linphone.LinphoneUtils;
 import com.socks.library.KLog;
 
-import org.linphone.core.CallDirection;
+import org.linphone.core.LinphoneAccountCreator;
 import org.linphone.core.LinphoneAddress;
-import org.linphone.core.LinphoneCallLog;
+import org.linphone.core.LinphoneAuthInfo;
 import org.linphone.core.LinphoneCoreException;
+import org.linphone.core.LinphoneCoreFactory;
 import org.linphone.core.LinphoneProxyConfig;
+import org.linphone.mediastream.Log;
+
+import static java.lang.Thread.sleep;
+
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -27,7 +31,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView dial;
     private TextView login;
     private static final String TAG = "MainActivity";
-    private LinPhoneDemo application;
+    private LinphoneAddress address;
+    private LinphonePreferences mPrefs;
+    private LinphoneAccountCreator accountCreator;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +43,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         et_num = findViewById(R.id.et_num);
         dial = findViewById(R.id.dial);
         login = findViewById(R.id.login);
-        application = (LinPhoneDemo) getApplication();
 
         dial.setOnClickListener(this);
         login.setOnClickListener(this);
-
 
 
     }
@@ -48,70 +53,112 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.dial:
-                // TODO: 2018/6/29 开始拨号
-                String trim = et_num.getText().toString().trim();
-                int anInt = Integer.parseInt(trim);
-                if (TextUtils.isEmpty(trim) || anInt < 1000 || anInt > 1020) {
-                    Toast.makeText(this, "号码不可用", Toast.LENGTH_SHORT).show();
-                    return;
-                }
 
-                try {
-                    if (!LinphoneManager.getInstance().acceptCallIfIncomingPending()) {
-                        KLog.i(TAG,"直接创建通话");
-                        LinphoneManager.getInstance().newOutgoingCall(trim,trim);
-                    } else {
-                        KLog.i(TAG, "========== 无法直接创建通话 = " + "false");
-                        if (LinphonePreferences.instance().isBisFeatureEnabled()) {//从未设置过，永远返回默认值true
-                            LinphoneCallLog[] logs = LinphoneManager.getLc().getCallLogs();
-                            LinphoneCallLog firstOutgoingCallLog = null;
-                            for (LinphoneCallLog log : logs) {
-                                if (log.getDirection() == CallDirection.Outgoing) {
-                                    firstOutgoingCallLog = log;
-                                    KLog.i(TAG, "========== 选中的日志 firstOutgoingCallLog = " + firstOutgoingCallLog);
-                                    break;
-                                }
-                            }
-                            if (firstOutgoingCallLog == null) {
-                                return;
-                            }
-
-                            LinphoneProxyConfig defaultProxyConfig = LinphoneManager.getLc().getDefaultProxyConfig();
-                            if (defaultProxyConfig != null && firstOutgoingCallLog.getTo().getDomain().equals(defaultProxyConfig.getDomain())) {
-                                et_num.setText(firstOutgoingCallLog.getTo().getUserName());
-                            } else {
-                                et_num.setText(firstOutgoingCallLog.getTo().asStringUriOnly());
-                            }
-                            et_num.setSelection(et_num.getText().toString().length());
-                        }
-                    }
-                } catch (LinphoneCoreException e) {
-                    e.printStackTrace();
-                    LinphoneManager.getInstance().terminateCall();
-                    Toast.makeText(application, "无法创建链接", Toast.LENGTH_SHORT).show();
-                }
-                break;
             case R.id.login:
-                application.linphoneLauncher.signUp(null, "1017", "172.16.12.234", "LinPhoneDemo", null, "1234", null, LinphoneAddress.TransportType.LinphoneTransportUdp, new DataFetcher<String>() {
-                    @Override
-                    public void onSuccess(String s) {
-                        KLog.i(TAG, "========== BaseActivity.onSuccess 注册方法调用完毕 " + "s = [" + s + "]");
-                        Toast.makeText(application, "登录成功", Toast.LENGTH_SHORT).show();
-                    }
+                initLinphone();
+                break;
 
-                    @Override
-                    public void onException(Throwable throwable) {
-                        KLog.i(TAG, "========== BaseActivity.onException  " + "注册方法调用出错 = [" + throwable.getMessage() + "]");
-                    }
-                });
+            case R.id.dial:
+                terminateLinphone();
                 break;
         }
+    }
+
+
+    public synchronized void initLinphone() {
+
+        if (LinphoneService.isReady()) {
+            onServiceReady("666006", "10.0.5.11", "1324");
+        } else {
+            startService(new Intent(this, LinphoneService.class));
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (!LinphoneService.isReady()) {
+                        try {
+                            sleep(300);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException("waiting thread sleep() has been interrupted");
+                        }
+                    }
+                    onServiceReady("666006", "10.0.5.11", "1324");
+                }
+            }).start();
+        }
+    }
+
+    public void terminateLinphone() {
+        //linphoneLauncher.terminate();
+    }
+
+    private void onServiceReady(String username, String domain, String password) {
+        mPrefs = LinphonePreferences.instance();
+
+        accountCreator = LinphoneCoreFactory.instance().createAccountCreator(LinphoneManager.getLcIfManagerNotDestroyedOrNull(), LinphonePreferences.instance().getConfig().getString("assistant", "xmlrpc_url", null));
+        accountCreator.setDomain(domain);
+        accountCreator.setListener(LinphoneManager.getInstance());
+
+        //удаление старых учеток
+        for (LinphoneProxyConfig str : LinphoneManager.getLc().getProxyConfigList()) {
+            try {
+                LinphoneAddress addr = LinphoneCoreFactory.instance().createLinphoneAddress(str.getIdentity());
+                LinphoneAuthInfo authInfo = LinphoneManager.getLc().findAuthInfo(addr.getUserName(), null, addr.getDomain());
+                if (authInfo != null) {
+                    LinphoneManager.getLc().removeAuthInfo(authInfo);
+                }
+            } catch (Exception e) {
+            }
+
+            if (str != null) {
+                LinphoneManager.getLc().removeProxyConfig(str);
+                LinphoneManager.getLc().setDefaultProxyConfig(null);
+            }
+        }
+
+        LinphoneManager.getLc().refreshRegisters();
+
+
+        username = LinphoneUtils.getDisplayableUsernameFromAddress(username);
+        domain = LinphoneUtils.getDisplayableUsernameFromAddress(domain);
+
+        String identity = "sip:" + username + "@" + domain;
+        KLog.i(TAG, "identity = " + identity);
+        try {
+            address = LinphoneCoreFactory.instance().createLinphoneAddress(identity);
+            KLog.i(TAG, "address = " + address);
+        } catch (LinphoneCoreException e) {
+            Log.e(e);
+        }
+
+        LinphonePreferences.AccountBuilder builder = new LinphonePreferences.AccountBuilder(LinphoneManager.getLc())
+                .setUsername(username)
+                .setDomain(domain)
+                .setPassword(password);
+
+
+        String forcedProxy = "";
+        if (!TextUtils.isEmpty(forcedProxy)) {
+            builder.setProxy(forcedProxy)
+                    .setOutboundProxyEnabled(true)
+                    .setAvpfRRInterval(5);
+        }
+
+        builder.setTransport(LinphoneAddress.TransportType.LinphoneTransportUdp);
+
+
+        try {
+            builder.saveNewAccount();
+        } catch (LinphoneCoreException e) {
+            e.printStackTrace();
+
+        }
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(application.serviceConnection);
+
     }
 }

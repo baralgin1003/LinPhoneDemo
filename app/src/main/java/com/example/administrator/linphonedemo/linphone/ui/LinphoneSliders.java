@@ -88,7 +88,7 @@ public class LinphoneSliders extends View implements OnGestureListener {
 
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                           float velocityY) {
+			float velocityY) {
 		return false;
 	}
 
@@ -99,7 +99,7 @@ public class LinphoneSliders extends View implements OnGestureListener {
 
 	@Override
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-                            float distanceY) {
+			float distanceY) {
 		if (e1.getY() < getHeight() - slidersHeight) {
 			return false;
 		}

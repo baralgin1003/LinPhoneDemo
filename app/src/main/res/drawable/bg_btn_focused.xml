@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <corners android:radius="5dp"/>
-    <gradient android:startColor="@color/bg_focus" android:endColor="@color/bg_focus"></gradient>
-    <solid android:color="@color/bg_focus"/>
-</shape>
